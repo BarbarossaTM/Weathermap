@@ -46,10 +46,8 @@ if (isset($options['d']))
 	ini_set('error_reporting', 0);
 }
 
-// Include config first to get install dir, then load defaults and config
-// again to get full set of config values.
-$init_modules = array('web');
-require realpath(__DIR__ . '/../../..') . '/includes/init.php';
+// Initialize Weathermap for LibreNMS
+require 'init.php';
 
 // Change to directory that map-poller was run from.
 // Thank you to Supun Rathnayake (https://twitter.com/supunr) for the bug report

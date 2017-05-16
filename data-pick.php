@@ -7,8 +7,6 @@ $ignore_librenms=FALSE;
 $config['base_url'] = '/';
 $whats_installed = '';
 
-$librenms_base = '../../../';
-
 $weathermap_config = array (
 	'show_interfaces' => 'all',
 	'sort_if_by' => 'ifAlias',
@@ -30,16 +28,8 @@ $valid_show_interfaces = array (
 	'0'    => 0,
 );
 
-	/*
-	 * Include the LibreNMS config, so we know about the database.
-	 *
-	 * Include config first to get install dir, then load defaults and config
-	 * again to get full set of config values.
-	 */
-	/* Load Weathermap config defaults, see file for description. */
-
-    $init_modules = array('web', 'auth');
-    require realpath(__DIR__ . '/../../..') . '/includes/init.php';
+// Initialize Weathermap for LibreNMS
+require 'init.php';
 
 	if (empty($_SESSION['authenticated']) || !isset($_SESSION['authenticated'])) {
 		header('Location: /');

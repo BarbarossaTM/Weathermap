@@ -44,16 +44,13 @@ if( isset($config) )
 // check if the goalposts have moved
 if( is_dir($librenms_base) && file_exists($librenms_base."/config.php") )
 {
-  // include the cacti-config, so we know about the database
-  chdir('../../');
-  $init_modules = array('web', 'auth');
-  require realpath(__DIR__ . '/../../..') . '/includes/init.php';
+  // Initialize Weathermap for LibreNMS
+  require 'init.php';
+
   if (empty($_SESSION['authenticated']) || !isset($_SESSION['authenticated']))
-  {
-    header('Location: /');
-  }
-  chdir('plugins/Weathermap');
-  $librenms_found = TRUE;
+	header('Location: /');
+
+	$librenms_found = TRUE;
 }
 else
 {
