@@ -3,7 +3,6 @@
 // ******************************************
 // sensible defaults
 $mapdir = 'configs';
-$ignore_librenms=FALSE;
 $config['base_url'] = '/';
 
 $weathermap_config = array (

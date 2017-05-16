@@ -17,7 +17,6 @@ if(! $ENABLED)
 $mapdir='configs';
 $librenms_base = '../../../';
 $librenms_url = '/';
-$ignore_librenms=FALSE;
 $configerror = '';
 
 $config_loaded = @include_once 'editor-config.php';
@@ -41,21 +40,12 @@ if( isset($config) )
     $configerror = 'OLD editor config file format. The format of this file changed in version 0.92 - please check the new editor-config.php-dist and update your editor-config.php file. [WMEDIT02]';
 }
 
-// check if the goalposts have moved
-if( is_dir($librenms_base) && file_exists($librenms_base."/config.php") )
-{
-  // Initialize Weathermap for LibreNMS
-  require 'init.php';
+// Initialize Weathermap for LibreNMS
+require 'init.php';
 
-  if (empty($_SESSION['authenticated']) || !isset($_SESSION['authenticated']))
+if (empty($_SESSION['authenticated']) || !isset($_SESSION['authenticated']))
 	header('Location: /');
 
-	$librenms_found = TRUE;
-}
-else
-{
-	$librenms_found = FALSE;
-}
 
 if(! is_writable($mapdir))
 {

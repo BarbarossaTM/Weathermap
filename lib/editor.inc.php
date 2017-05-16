@@ -127,15 +127,7 @@ function show_editor_startpage()
     if ($configerror!='') {
         $errormessage .= $configerror.'<p>';
     }
-		
-	if ( !$librenms_found && !$ignore_librenms) {
-		//$errormessage .= '$cacti_base is not set correctly. Cacti integration will be disabled in the editor.';
-		//$errormessage .= "$librenms_found and $ignore_librenms";
-		//if ($config_loaded != 1) { 
-            	//$errormessage .= " You might need to copy editor-config.php-dist to editor-config.php and edit it."; 
-        	//}
-	}
-	
+
 	if ($errormessage != '') {
 		print '<div class="alert" id="nocacti">'.htmlspecialchars($errormessage).'</div>';
 	}
