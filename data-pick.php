@@ -2,10 +2,9 @@
 
 // ******************************************
 // sensible defaults
-$mapdir='configs';
+$mapdir = 'configs';
 $ignore_librenms=FALSE;
 $config['base_url'] = '/';
-$whats_installed = '';
 
 $weathermap_config = array (
 	'show_interfaces' => 'all',
@@ -31,24 +30,22 @@ $valid_show_interfaces = array (
 // Initialize Weathermap for LibreNMS
 require 'init.php';
 
-	if (empty($_SESSION['authenticated']) || !isset($_SESSION['authenticated'])) {
-		header('Location: /');
-	}
+// Bail out if the user isn't authenticated
+if (empty ($_SESSION['authenticated']) || !isset ($_SESSION['authenticated'])) {
+	header ('Location: /');
+}
 
-	chdir('plugins/Weathermap');
-	$librenms_found = TRUE;
+/* Validate configuration, see defaults.inc.php for explaination */
+if (in_array ($config['plugins']['Weathermap']['sort_if_by'], $valid_sort_if_by))
+	$weathermap_config['sort_if_by'] = $config['plugins']['Weathermap']['sort_if_by'];
 
-	/* Validate configuration, see defaults.inc.php for explaination */
-	if (in_array ($config['plugins']['Weathermap']['sort_if_by'], $valid_sort_if_by))
-		$weathermap_config['sort_if_by'] = $config['plugins']['Weathermap']['sort_if_by'];
+if (in_array ($config['plugins']['Weathermap']['show_interfaces'], $valid_show_interfaces))
+	$weathermap_config['show_interfaces'] = $valid_show_interfaces[$config['plugins']['Weathermap']['show_interfaces']];
+elseif (validate_device_id ($config['plugins']['Weathermap']['show_interfaces']))
+	$weathermap_config['show_interfaces'] = $config['plugins']['Weathermap']['show_interfaces'];
 
-	if (in_array ($config['plugins']['Weathermap']['show_interfaces'], $valid_show_interfaces))
-		$weathermap_config['show_interfaces'] = $valid_show_interfaces[$config['plugins']['Weathermap']['show_interfaces']];
-	elseif (validate_device_id ($config['plugins']['Weathermap']['show_interfaces']))
-		$weathermap_config['show_interfaces'] = $config['plugins']['Weathermap']['show_interfaces'];
-
-$link = mysqli_connect($config['db_host'],$config['db_user'],$config['db_pass'],$config['db_name'],$config['db_port'])
-                or die('Could not connect: ' . mysqli_error($link));
+$link = mysqli_connect ($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name'], $config['db_port'])
+	or die('Could not connect: ' . mysqli_error($link));
 
 // ******************************************
 
@@ -65,14 +62,6 @@ function js_escape($str)
 if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step2')
 {
 	$dataid = intval($_REQUEST['dataid']);
-
-	//$SQL_graphid = sprintf("SELECT graph_templates_item.local_graph_id, title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd where graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id  and task_item_id=data_template_rrd.id and local_data_id=%d LIMIT 1;",$dataid);
-
-	//mysql_selectdb($config['db_name'],$link) or die('Could not select database: '.mysql_error());
-
-	//$result = mysql_query($SQL_graphid) or die('Query failed: ' . mysql_error());
-	//$line = mysql_fetch_array($result, MYSQL_ASSOC);
-	//$graphid = $line['local_graph_id'];
 
 ?>
 <html>
@@ -258,8 +247,6 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 <body>
 <?php
 
-	//$SQL_picklist = "select data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache, data_template_data.active, data_template_data.data_source_path from data_local,data_template_data,data_input,data_template where data_local.id=data_template_data.local_data_id and data_input.id=data_template_data.data_input_id and data_local.data_template_id=data_template.id ";
-
 	$host_id = $weathermap_config['show_interfaces'];
 	
 	$overlib = true;
@@ -272,7 +259,6 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 	if (isset ($_REQUEST['host_id']) and !empty ($_REQUEST['host_id']))
 	{
 		$host_id = intval ($_REQUEST['host_id']);
-		//if($host_id>=0) $SQL_picklist .= " and data_local.host_id=$host_id ";
 	}
 
 	/* If the editor gave us the links source node name, try to find the device_id
@@ -285,13 +271,9 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 			$host_id = $node1_id;
 	}
 	
-	//$SQL_picklist .= " order by name_cache;";
-	
-	 // Link query
-	 $result = mysqli_query($link,"SELECT device_id,hostname FROM devices ORDER BY hostname");
-	 //$hosts = mysql_fetch_assoc($result);
-	 //$result = mysql_query($SQL_picklist);
-	 $hosts = 1;
+	// Link query
+	$result = mysqli_query($link,"SELECT device_id,hostname FROM devices ORDER BY hostname");
+	$hosts = 1;
 ?>
 
 <h3>Pick a data source:</h3>
@@ -355,12 +337,6 @@ if(sizeof($hosts) > 0) {
 		print "<li>No results...</li>";
 	}
 
-	// Free resultset
-	//mysql_free_result($result);
-
-	// Closing connection
-	//mysql_close($link);
-
 ?>
 </ul>
 </div>
@@ -373,7 +349,6 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='node_step1')
 {
 	$host_id = -1;
 	$SQL_picklist = "SELECT `device_id` AS `id`,`hostname` AS `name` FROM devices ORDER BY hostname";
-	//$SQL_picklist = "SELECT 1,2,'Test','Y','/dsad'";
 	
 	$overlib = true;
 	$aggregate = false;
@@ -385,9 +360,7 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='node_step1')
 	if(isset($_REQUEST['host_id']))
 	{
 		$host_id = intval($_REQUEST['host_id']);
-		//if($host_id>=0) $SQL_picklist .= " and graph_local.host_id=$host_id ";
 	}
-	//$SQL_picklist .= " order by title_cache";	
 	
 	 $query = mysqli_query($link,"SELECT id,hostname AS name FROM `devices` ORDER BY hostname");
 	 $hosts = mysqli_fetch_assoc($query);	
@@ -412,7 +385,6 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='node_step1')
 		{	
 				$('ul#dslist > li').hide();
 				$("ul#dslist > li:contains('" + filterstring + "')").show();
-				//$('ul#dslist > li').contains(filterstring).show();
 		}
 	}
 
@@ -434,15 +406,7 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='node_step1')
 				{
 					strURL = strURL + "&overlib=0";
 				}
-				
-				//if( objForm.aggregate.checked)
-				//{
-				//	strURL = strURL + "&aggregate=1";
-				//}
-				//else
-				//{
-				//	strURL = strURL + "&aggregate=0";
-				//}
+
                 document.location = strURL;
         }
 	
