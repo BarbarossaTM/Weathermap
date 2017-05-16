@@ -28,17 +28,13 @@ $grid_snap_value = 0; // set non-zero to snap to a grid of that spacing
 
 if( isset($_COOKIE['wmeditor']))
 {
-    //$parts = preg_split(":",$_COOKIE['wmeditor']);
-
     if( (isset($parts[0])) && (intval($parts[0]) == 1) ) { $use_overlay = TRUE; }
     if( (isset($parts[1])) && (intval($parts[1]) == 1) ) { $use_relative_overlay = TRUE; }
     if( (isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }
 }
 
 if( isset($config) )
-{
     $configerror = 'OLD editor config file format. The format of this file changed in version 0.92 - please check the new editor-config.php-dist and update your editor-config.php file. [WMEDIT02]';
-}
 
 // Initialize Weathermap for LibreNMS
 require 'init.php';
@@ -48,9 +44,7 @@ if (empty($_SESSION['authenticated']) || !isset($_SESSION['authenticated']))
 
 chdir(dirname(__FILE__));
 if(! is_writable($mapdir))
-{
 	$configerror = "The map config directory is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]";
-}
 
 
 $action = '';
@@ -92,9 +86,6 @@ else
 	wm_debug("Starting Edit Run: action is $action on $mapname\n");
 	wm_debug("==========================================================================================================\n");
 
-	# editor_log("\n\n-----------------------------------------------------------------------------\nNEW REQUEST:\n\n");
-	# editor_log(var_log($_REQUEST));
-
 	$map = new WeatherMap;
 	$map->context = 'editor';
 
@@ -130,7 +121,6 @@ else
 		$keyheight = imagefontheight($keyfont)+2;
 
 		$sampleheight = 32;
-		// $im = imagecreate(250,imagefontheight(5)+5);
 		$im = imagecreate(2000,$sampleheight);
 		$imkey = imagecreate(2000,$keyheight);
 
@@ -140,7 +130,6 @@ else
 		$blackkey = imagecolorallocate($imkey,0,0,0);
 
 		$x = 3;
-		#for($i=1; $i< 6; $i++)
 		foreach ($map->fonts as $fontnumber => $font)
 		{
 			$string = "Abc123%";
@@ -386,11 +375,9 @@ else
 		    $map->links[$link_name]->comments[IN] =  wm_editor_sanitize_string($_REQUEST['link_commentin']);
 		    $map->links[$link_name]->comments[OUT] = wm_editor_sanitize_string($_REQUEST['link_commentout']);
 		    $map->links[$link_name]->commentoffset_in =  intval($_REQUEST['link_commentposin']);
-		    $map->links[$link_name]->commentoffset_out = intval($_REQUEST['link_commentposout']); 
+		    $map->links[$link_name]->commentoffset_out = intval($_REQUEST['link_commentposout']);
 
-		    // $map->links[$link_name]->target = $_REQUEST['link_target'];
-
-		    $targets = preg_split('/\s+/',$_REQUEST['link_target'],-1,PREG_SPLIT_NO_EMPTY); 
+		    $targets = preg_split('/\s+/',$_REQUEST['link_target'],-1,PREG_SPLIT_NO_EMPTY);
 		    $new_target_list = array();
 
 		    foreach ($targets as $target)
@@ -429,7 +416,6 @@ else
 			$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
 			$map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
 		    }
-		    // $map->links[$link_name]->SetBandwidth($bwin,$bwout);
 
 		    $map->WriteConfig($mapfile);
 		}
@@ -487,12 +473,10 @@ else
 			$map->links['DEFAULT']->max_bandwidth_in = unformat_number($bwin, $map->kilo);
                         $map->links['DEFAULT']->max_bandwidth_out = unformat_number($bwout, $map->kilo);
 
-			// $map->defaultlink->SetBandwidth($bwin,$bwout);
 			foreach ($map->links as $link)
 			{
 			    if( ($link->max_bandwidth_in_cfg == $bwin_old) || ($link->max_bandwidth_out_cfg == $bwout_old) )
 			    {
-	    //			$link->SetBandwidth($bwin,$bwout);
 				    $link_name = $link->name;
 				    $map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
 				    $map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
@@ -503,7 +487,7 @@ else
 		}
 
 		$map->WriteConfig($mapfile);
-		break; 
+		break;
 
 	case 'set_map_style':
 		$map->ReadConfig($mapfile);
@@ -530,9 +514,7 @@ else
 		$map->ReadConfig($mapfile);
 
 		$param2 = $_REQUEST['param'];
-		# $param2 = substr($param2,0,-2);
 		$newaction = 'add_link2';
-              #  print $newaction;
 		$selected = 'NODE:'.$param2;
 
 		break;
@@ -541,7 +523,6 @@ else
 		$map->ReadConfig($mapfile);
 		$a = $_REQUEST['param2'];
 		$b = $_REQUEST['param'];
-		# $b = substr($b,0,-2);
 		$log = "[$a -> $b]";
 
 		if($a != $b && isset($map->nodes[$a]) && isset($map->nodes[$b]) )
@@ -551,8 +532,6 @@ else
 
 			$newlink->a = $map->nodes[$a];
 			$newlink->b = $map->nodes[$b];
-
-			// $newlink->SetBandwidth($map->defaultlink->max_bandwidth_in_cfg, $map->defaultlink->max_bandwidth_out_cfg);
 
 			$newlink->width = $map->links['DEFAULT']->width;
 
@@ -660,9 +639,6 @@ else
 					    $angle_old = rad2deg(atan2(-$dy_old,$dx_old));
 					    $angle_new = rad2deg(atan2(-$dy_new,$dx_new));
 
-					    # $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
-					    # $log .= "$dx_new $dy_new $l_new => $angle_new\n";
-
 					    // the geometry stuff uses a different point format, helpfully
 					    $points = array();
 					    foreach($link->vialist as $via)
@@ -672,7 +648,6 @@ else
 					    }
 
 					    $scalefactor = $l_new/$l_old;
-					    # $log .= "Scale by $scalefactor along link-line";
 
 					    // rotate so that link is along the axis
 					    RotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
@@ -1003,11 +978,6 @@ else
 	$map->PreloadMapHTML();
 
 	print $map->SortedImagemap("weathermap_imap");
-
-	#print $map->imap->subHTML("LEGEND:");
-	#print $map->imap->subHTML("TIMESTAMP");
-	#print $map->imap->subHTML("NODE:");
-	#print $map->imap->subHTML("LINK:");
 
 ?>
 	</div><!-- Node Properties -->
