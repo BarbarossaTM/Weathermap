@@ -46,13 +46,12 @@ require 'init.php';
 if (empty($_SESSION['authenticated']) || !isset($_SESSION['authenticated']))
 	header('Location: /');
 
-
+chdir(dirname(__FILE__));
 if(! is_writable($mapdir))
 {
 	$configerror = "The map config directory is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]";
 }
 
-chdir(dirname(__FILE__));
 
 $action = '';
 $mapname = '';
